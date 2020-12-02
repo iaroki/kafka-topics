@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -13,11 +14,11 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var Version string = "12"
-var topicFile string = "topics.txt"
-var kafkaBroker string = os.Getenv("KAFKA_BROKER")
-var kafkaUser string = os.Getenv("KAFKA_USER")
-var kafkaPass string = os.Getenv("KAFKA_PASS")
+var topicVersion = os.Getenv("TOPIC_VERSION")
+var topicFile = os.Getenv("TOPIC_FILE")
+var kafkaBroker = os.Getenv("KAFKA_BROKER")
+var kafkaUser = os.Getenv("KAFKA_USER")
+var kafkaPass = os.Getenv("KAFKA_PASS")
 
 func getAdminClient() *kafka.AdminClient {
 	adminClient, err := kafka.NewAdminClient(&kafka.ConfigMap{
@@ -34,22 +35,11 @@ func getAdminClient() *kafka.AdminClient {
 	return adminClient
 }
 
-func listTopics(adminClient *kafka.AdminClient) {
-	metadata, err := adminClient.GetMetadata(nil, true, 3000)
+func listTopics(topics []string) {
 
-	if err != nil {
-		log.Fatalf("Metadata error: %s", err)
-	}
+	sort.Strings(topics)
 
-	var mydata []string
-
-	for topic := range metadata.Topics {
-		mydata = append(mydata, topic)
-
-	}
-	sort.Strings(mydata)
-
-	for _, topic := range mydata {
+	for _, topic := range topics {
 		//log.Printf("%s %d\n", topic, len(metadata.Topics[topic].Partitions))
 		fmt.Println(topic)
 	}
@@ -81,8 +71,31 @@ func deleteTopic(adminClient *kafka.AdminClient, name string) {
 	fmt.Printf("Deleting %s... %s\n", result[0].Topic, result[0].Error)
 }
 
+func getTopicsFromBroker(adminClient *kafka.AdminClient) []string {
+	metadata, err := adminClient.GetMetadata(nil, true, 3000)
+
+	if err != nil {
+		log.Fatalf("Metadata error: %s", err)
+	}
+
+	var topicsMetadata []string
+
+	for topic := range metadata.Topics {
+		topicsMetadata = append(topicsMetadata, topic)
+
+	}
+
+	return topicsMetadata
+}
+
 func getTopicsFromFile(filePath string, version string) []string {
-	file, err := os.Open(filePath)
+
+	absolutePath, err := filepath.Abs(filePath)
+	if err != nil {
+		log.Fatalf("File did not detected: %s", err)
+	}
+	fmt.Println("Opening topic file:", absolutePath)
+	file, err := os.Open(absolutePath)
 
 	if err != nil {
 		log.Fatalf("Failed opening file: %s", err)
@@ -100,7 +113,7 @@ func getTopicsFromFile(filePath string, version string) []string {
 		fileTopics = append(fileTopics, topic)
 	}
 
-	file.Close()
+	_ = file.Close()
 
 	return fileTopics
 }
@@ -108,7 +121,6 @@ func getTopicsFromFile(filePath string, version string) []string {
 func initApp() {
 
 	var action string
-	var environment string
 
 	app := &cli.App{
 		Name:  "kafka-topics",
@@ -117,7 +129,7 @@ func initApp() {
 			&cli.StringFlag{
 				Name:        "action",
 				Aliases:     []string{"a"},
-				Usage:       "action to take [ add | del | list ]",
+				Usage:       "action to take [ add | del | list | search [arg] | clean [force] ]",
 				Destination: &action,
 				Required:    true,
 			},
@@ -125,25 +137,57 @@ func initApp() {
 		Action: func(c *cli.Context) error {
 
 			if action == "add" {
-				fmt.Println("Adding to environment:", environment)
-				topics := getTopicsFromFile(topicFile, Version)
+				fmt.Println("Adding topics to broker:", kafkaBroker)
+				adminClient := getAdminClient()
+				topics := getTopicsFromFile(topicFile, topicVersion)
 				for _, topic := range topics {
-					adminClient := getAdminClient()
+
 					createTopic(adminClient, topic, "-1")
 
 				}
 			} else if action == "del" {
-				fmt.Println("Deleting from environment:", environment)
-				topics := getTopicsFromFile(topicFile, Version)
+				fmt.Println("Deleting topics from broker:", kafkaBroker)
+				adminClient := getAdminClient()
+				topics := getTopicsFromFile(topicFile, topicVersion)
 				for _, topic := range topics {
-					adminClient := getAdminClient()
+
 					deleteTopic(adminClient, topic)
 
 				}
 			} else if action == "list" {
-				fmt.Println("Listing for environment:", environment)
+				fmt.Println("Listing topics for broker:", kafkaBroker)
 				adminClient := getAdminClient()
-				listTopics(adminClient)
+				topics := getTopicsFromBroker(adminClient)
+				listTopics(topics)
+			} else if action == "search" {
+				if c.NArg() > 0 {
+					var filter string
+					filter = c.Args().Get(0)
+					fmt.Printf("Searching *%s* topics for broker: %s \n", filter, kafkaBroker)
+					adminClient := getAdminClient()
+					topics := getTopicsFromBroker(adminClient)
+					var filteredTopics []string
+					for _, topic := range topics {
+						if strings.Contains(topic, filter) {
+							filteredTopics = append(filteredTopics, topic)
+						}
+					}
+					listTopics(filteredTopics)
+				}
+			} else if action == "clean" {
+				if c.NArg() > 0 {
+					if c.Args().Get(0) == "force" {
+						fmt.Println("Cleaning topics for broker:", kafkaBroker)
+						adminClient := getAdminClient()
+						topics := getTopicsFromBroker(adminClient)
+						for _, topic := range topics {
+
+							deleteTopic(adminClient, topic)
+
+						}
+					}
+				}
+
 			} else {
 				fmt.Println("Wrong arguments... Try help")
 			}
@@ -157,26 +201,7 @@ func initApp() {
 	}
 }
 
-func parser() {
-	//os.A
-}
-
 func main() {
 
-	adminClient := getAdminClient()
-	listTopics(adminClient)
-	//fmt.Println("#############################################")
-	//topics := getTopicsFromFile(topicFile, Version)
-	//for _, topic := range topics {
-	//	fmt.Println(topic)
-	//if strings.HasSuffix(topic, "_v14") {
-	//	deleteTopic(adminClient, topic)
-	//}
-		//createTopic(adminClient, topic, "-1")
-	//deleteTopic(adminClient, topic)
-	//}
-	//createTopic(adminClient, "test", "-1")
-	//deleteTopic(adminClient, "test")
-
-	//initApp()
+	initApp()
 }
