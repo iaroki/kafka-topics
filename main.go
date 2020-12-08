@@ -1,12 +1,10 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 	"sort"
 	"strings"
 
@@ -88,35 +86,35 @@ func getTopicsFromBroker(adminClient *kafka.AdminClient) []string {
 	return topicsMetadata
 }
 
-func getTopicsFromFile(filePath string, version string) []string {
-
-	absolutePath, err := filepath.Abs(filePath)
-	if err != nil {
-		log.Fatalf("File did not detected: %s", err)
-	}
-	fmt.Println("Opening topic file:", absolutePath)
-	file, err := os.Open(absolutePath)
-
-	if err != nil {
-		log.Fatalf("Failed opening file: %s", err)
-	}
-
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanLines)
-	var fileTopics []string
-
-	for scanner.Scan() {
-		topic := scanner.Text()
-		if strings.HasSuffix(topic, "Commands") {
-			topic = topic + "_v" + version
-		}
-		fileTopics = append(fileTopics, topic)
-	}
-
-	_ = file.Close()
-
-	return fileTopics
-}
+//func getTopicsFromFile(filePath string, version string) []string {
+//
+//	absolutePath, err := filepath.Abs(filePath)
+//	if err != nil {
+//		log.Fatalf("File did not detected: %s", err)
+//	}
+//	fmt.Println("Opening topic file:", absolutePath)
+//	file, err := os.Open(absolutePath)
+//
+//	if err != nil {
+//		log.Fatalf("Failed opening file: %s", err)
+//	}
+//
+//	scanner := bufio.NewScanner(file)
+//	scanner.Split(bufio.ScanLines)
+//	var fileTopics []string
+//
+//	for scanner.Scan() {
+//		topic := scanner.Text()
+//		if strings.HasSuffix(topic, "Commands") {
+//			topic = topic + "_v" + version
+//		}
+//		fileTopics = append(fileTopics, topic)
+//	}
+//
+//	_ = file.Close()
+//
+//	return fileTopics
+//}
 
 func initApp() {
 
@@ -140,19 +138,20 @@ func initApp() {
 				fmt.Println("Adding topics to broker:", kafkaBroker)
 				adminClient := getAdminClient()
 				//topics := getTopicsFromFile(topicFile, topicVersion)
-				topics := getYaml()
+				topics := getYamlData(topicFile)
 				for _, topic := range topics.Tpcs {
-					createTopic(adminClient, topic.Name, topic.Partitions, topic.ReplicationFactor, topic.RetentionMs, topic.CleanupPolicy)
+					topicName := versionize(topic.Name, topicVersion) // COMMAND VERSIONIZER
+					createTopic(adminClient, topicName, topic.Partitions, topic.ReplicationFactor, topic.RetentionMs, topic.CleanupPolicy)
 					//fmt.Println(topic.Name, topic.Partitions, topic.ReplicationFactor, topic.RetentionMs, topic.CleanupPolicy)
 				}
 
 			} else if action == "del" {
 				fmt.Println("Deleting topics from broker:", kafkaBroker)
 				adminClient := getAdminClient()
-				topics := getTopicsFromFile(topicFile, topicVersion)
-				for _, topic := range topics {
-
-					deleteTopic(adminClient, topic)
+				topics := getYamlData(topicFile)
+				for _, topic := range topics.Tpcs {
+					topicName := versionize(topic.Name, topicVersion) // COMMAND VERSIONIZER
+					deleteTopic(adminClient, topicName)
 
 				}
 			} else if action == "list" {

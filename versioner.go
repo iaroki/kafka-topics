@@ -5,16 +5,11 @@ import (
 )
 
 
-func versionize(topics []string, version string) []string {
+func versionize(topic string, version string) string {
 
-	var versionedTopics []string
-
-	for _, topic := range topics {
-		if strings.HasSuffix(topic, "Commands") {
+			if strings.HasSuffix(topic, "Commands") {
 			topic = topic + "_v" + version
 		}
-		versionedTopics = append(versionedTopics, topic)
-	}
 
-	return versionedTopics
+	return topic
 }
