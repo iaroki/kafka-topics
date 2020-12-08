@@ -28,7 +28,6 @@ func listTopics(topics []string) {
 	sort.Strings(topics)
 
 	for _, topic := range topics {
-		//log.Printf("%s %d\n", topic, len(metadata.Topics[topic].Partitions))
 		fmt.Println(topic)
 	}
 }

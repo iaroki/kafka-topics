@@ -8,9 +8,9 @@ topics:
   - name: uberEvents
     partitions: 60
     replicationFactor: 3
-    retention: -1
+    retentionMs: -1
 
   - name: uberNotifications
     partitions: 60
     replicationFactor: 3
-    retention: 604800000
+    retentionMs: 604800000

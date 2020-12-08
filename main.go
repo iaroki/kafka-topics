@@ -10,7 +10,7 @@ import (
 )
 
 var topicVersion = os.Getenv("TOPIC_VERSION")
-var topicFile = os.Getenv("TOPIC_FILE")
+var topicFile string //= os.Getenv("TOPIC_FILE")
 var kafkaBroker = os.Getenv("KAFKA_BROKER")
 var kafkaUser = os.Getenv("KAFKA_USER")
 var kafkaPass = os.Getenv("KAFKA_PASS")
@@ -30,18 +30,23 @@ func initApp() {
 				Destination: &action,
 				Required:    true,
 			},
+			&cli.StringFlag{
+				Name:        "file",
+				Aliases:     []string{"f"},
+				Usage:       "file to load [ topics.yaml ]",
+				Destination: &topicFile,
+				Required:    false,
+			},
 		},
 		Action: func(c *cli.Context) error {
 
 			if action == "add" {
 				fmt.Println("Adding topics to broker:", kafkaBroker)
 				adminClient := getAdminClient()
-				//topics := getTopicsFromFile(topicFile, topicVersion)
 				topics := getYamlData(topicFile)
 				for _, topic := range topics.Tpcs {
 					topicName := versionize(topic.Name, topicVersion) // COMMAND VERSIONIZER
 					createTopic(adminClient, topicName, topic.Partitions, topic.ReplicationFactor, topic.RetentionMs, topic.CleanupPolicy)
-					//fmt.Println(topic.Name, topic.Partitions, topic.ReplicationFactor, topic.RetentionMs, topic.CleanupPolicy)
 				}
 
 			} else if action == "del" {
@@ -51,7 +56,6 @@ func initApp() {
 				for _, topic := range topics.Tpcs {
 					topicName := versionize(topic.Name, topicVersion) // COMMAND VERSIONIZER
 					deleteTopic(adminClient, topicName)
-
 				}
 			} else if action == "list" {
 				fmt.Println("Listing topics for broker:", kafkaBroker)
@@ -80,9 +84,7 @@ func initApp() {
 						adminClient := getAdminClient()
 						topics := getTopicsFromBroker(adminClient)
 						for _, topic := range topics {
-
 							deleteTopic(adminClient, topic)
-
 						}
 					}
 				}
