@@ -45,9 +45,9 @@ func listTopics(topics []string) {
 	}
 }
 
-func createTopic(adminClient *kafka.AdminClient, name string, retention string) {
-	topicConfig := map[string]string{"retention.ms": retention}
-	topicSpec := kafka.TopicSpecification{Topic: name, NumPartitions: 60, ReplicationFactor: 3, Config: topicConfig}
+func createTopic(adminClient *kafka.AdminClient, name string, partitions int, replicationFactor int, retention string, cleanupPolicy string) {
+	topicConfig := map[string]string{"retention.ms": retention, "cleanup.policy": cleanupPolicy}
+	topicSpec := kafka.TopicSpecification{Topic: name, NumPartitions: partitions, ReplicationFactor: replicationFactor, Config: topicConfig}
 	topicSpecs := []kafka.TopicSpecification{topicSpec}
 	ctx := context.Background()
 	result, err := adminClient.CreateTopics(ctx, topicSpecs)
@@ -139,12 +139,13 @@ func initApp() {
 			if action == "add" {
 				fmt.Println("Adding topics to broker:", kafkaBroker)
 				adminClient := getAdminClient()
-				topics := getTopicsFromFile(topicFile, topicVersion)
-				for _, topic := range topics {
-
-					createTopic(adminClient, topic, "-1")
-
+				//topics := getTopicsFromFile(topicFile, topicVersion)
+				topics := getYaml()
+				for _, topic := range topics.Tpcs {
+					createTopic(adminClient, topic.Name, topic.Partitions, topic.ReplicationFactor, topic.RetentionMs, topic.CleanupPolicy)
+					//fmt.Println(topic.Name, topic.Partitions, topic.ReplicationFactor, topic.RetentionMs, topic.CleanupPolicy)
 				}
+
 			} else if action == "del" {
 				fmt.Println("Deleting topics from broker:", kafkaBroker)
 				adminClient := getAdminClient()
