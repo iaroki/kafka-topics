@@ -10,7 +10,6 @@ import (
 )
 
 var topicVersion = os.Getenv("TOPIC_VERSION")
-var topicFile string //= os.Getenv("TOPIC_FILE")
 var kafkaBroker = os.Getenv("KAFKA_BROKER")
 var kafkaUser = os.Getenv("KAFKA_USER")
 var kafkaPass = os.Getenv("KAFKA_PASS")
@@ -18,6 +17,7 @@ var kafkaPass = os.Getenv("KAFKA_PASS")
 func initApp() {
 
 	var action string
+	var topicFile string
 
 	app := &cli.App{
 		Name:  "kafka-topics",

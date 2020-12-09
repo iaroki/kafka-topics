@@ -59,7 +59,7 @@ func deleteTopic(adminClient *kafka.AdminClient, name string) {
 }
 
 func getTopicsFromBroker(adminClient *kafka.AdminClient) []string {
-	metadata, err := adminClient.GetMetadata(nil, true, 3000)
+	metadata, err := adminClient.GetMetadata(nil, true, 5000)
 
 	if err != nil {
 		log.Fatalf("Metadata error: %s", err)
