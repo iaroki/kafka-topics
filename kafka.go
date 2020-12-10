@@ -36,8 +36,7 @@ func createTopic(adminClient *kafka.AdminClient, name string, partitions int, re
 	topicConfig := map[string]string{"retention.ms": retention, "cleanup.policy": cleanupPolicy}
 	topicSpec := kafka.TopicSpecification{Topic: name, NumPartitions: partitions, ReplicationFactor: replicationFactor, Config: topicConfig}
 	topicSpecs := []kafka.TopicSpecification{topicSpec}
-	ctx := context.Background()
-	result, err := adminClient.CreateTopics(ctx, topicSpecs)
+	result, err := adminClient.CreateTopics(context.Background(), topicSpecs)
 
 	if err != nil {
 		log.Fatalf("Topic create error: %s", err)
@@ -48,8 +47,7 @@ func createTopic(adminClient *kafka.AdminClient, name string, partitions int, re
 
 func deleteTopic(adminClient *kafka.AdminClient, name string) {
 	topics := []string{name}
-	ctx := context.Background()
-	result, err := adminClient.DeleteTopics(ctx, topics)
+	result, err := adminClient.DeleteTopics(context.Background(), topics)
 
 	if err != nil {
 		log.Fatalf("Topic delete error: %s", err)
