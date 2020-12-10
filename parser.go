@@ -11,11 +11,11 @@ type Topic struct {
 	Partitions        int    `yaml:"partitions"`
 	ReplicationFactor int    `yaml:"replicationFactor"`
 	RetentionMs       string `yaml:"retentionMs"`
-	CleanupPolicy     string `yaml:"cleanupPolicy"`
+	CleanupPolicy     string `yaml:"cleanupPolicy,omitempty"`
 }
 
 type Topics struct {
-	Tpcs []Topic `topics`
+	Tpcs []Topic `yaml:"topics"`
 }
 
 func getYamlData(fileName string) Topics {
