@@ -18,18 +18,12 @@ func initApp() {
 
 	var action string
 	var topicFile string
+	var confirmation bool
 
 	app := &cli.App{
 		Name:  "kafka-topics",
 		Usage: "manage Kafka topics",
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "action",
-				Aliases:     []string{"a"},
-				Usage:       "action to take [ add | del | list | search [arg] | clean [force] ]",
-				Destination: &action,
-				Required:    true,
-			},
 			&cli.StringFlag{
 				Name:        "file",
 				Aliases:     []string{"f"},
@@ -37,32 +31,48 @@ func initApp() {
 				Destination: &topicFile,
 				Required:    false,
 			},
+			&cli.StringFlag{
+				Name:        "action",
+				Aliases:     []string{"a"},
+				Usage:       "action to take [ add | del [force] | list | search [arg] | clean [force] ]",
+				Destination: &action,
+				Required:    true,
+			},
+			&cli.BoolFlag{
+				Name:        "yes",
+				Aliases:     []string{"y"},
+				Usage:       "confirmation [ yes ]",
+				Destination: &confirmation,
+				Required:    false,
+			},
 		},
 		Action: func(c *cli.Context) error {
 
-			if action == "add" {
+			switch action {
+			case "add":
 				fmt.Println("Adding topics to broker:", kafkaBroker)
-				adminClient := getAdminClient()
 				topics := getYamlData(topicFile)
+				adminClient := getAdminClient()
 				for _, topic := range topics.Tpcs {
 					topicName := versionize(topic.Name, topicVersion) // COMMAND VERSIONIZER
 					createTopic(adminClient, topicName, topic.Partitions, topic.ReplicationFactor, topic.RetentionMs, topic.CleanupPolicy)
 				}
-
-			} else if action == "del" {
-				fmt.Println("Deleting topics from broker:", kafkaBroker)
-				adminClient := getAdminClient()
-				topics := getYamlData(topicFile)
-				for _, topic := range topics.Tpcs {
-					topicName := versionize(topic.Name, topicVersion) // COMMAND VERSIONIZER
-					deleteTopic(adminClient, topicName)
+			case "del":
+				if confirmation {
+					fmt.Println("Deleting topics from broker:", kafkaBroker)
+					topics := getYamlData(topicFile)
+					adminClient := getAdminClient()
+					for _, topic := range topics.Tpcs {
+						topicName := versionize(topic.Name, topicVersion) // COMMAND VERSIONIZER
+						deleteTopic(adminClient, topicName)
+					}
 				}
-			} else if action == "list" {
+			case "list":
 				fmt.Println("Listing topics for broker:", kafkaBroker)
 				adminClient := getAdminClient()
 				topics := getTopicsFromBroker(adminClient)
 				listTopics(topics)
-			} else if action == "search" {
+			case "search":
 				if c.NArg() > 0 {
 					var filter string
 					filter = c.Args().Get(0)
@@ -77,21 +87,19 @@ func initApp() {
 					}
 					listTopics(filteredTopics)
 				}
-			} else if action == "clean" {
-				if c.NArg() > 0 {
-					if c.Args().Get(0) == "force" {
+			case "clean":
+				if confirmation {
 						fmt.Println("Cleaning topics for broker:", kafkaBroker)
 						adminClient := getAdminClient()
 						topics := getTopicsFromBroker(adminClient)
 						for _, topic := range topics {
 							deleteTopic(adminClient, topic)
-						}
 					}
 				}
-
-			} else {
+			default:
 				fmt.Println("Wrong arguments... Try help")
 			}
+
 			return nil
 		},
 	}
