@@ -16,8 +16,7 @@ var kafkaPass = os.Getenv("KAFKA_PASS")
 
 func initApp() {
 
-	var action string
-	var topicFile string
+	var action,topicFile string
 	var confirmation bool
 
 	app := &cli.App{
@@ -47,29 +46,26 @@ func initApp() {
 			},
 		},
 		Action: func(c *cli.Context) error {
-
+			adminClient := getAdminClient()
 			switch action {
 			case "add":
 				fmt.Println("Adding topics to broker:", kafkaBroker)
 				topics := getYamlData(topicFile)
-				adminClient := getAdminClient()
 				for _, topic := range topics.Tpcs {
-					topicName := versionize(topic.Name, topicVersion) // COMMAND VERSIONIZER
-					createTopic(adminClient, topicName, topic.Partitions, topic.ReplicationFactor, topic.RetentionMs, topic.CleanupPolicy)
+					topic.Name = versionize(topic.Name, topicVersion) // COMMAND VERSIONIZER
+					createTopic(adminClient, topic.Name, topic.Partitions, topic.ReplicationFactor, topic.RetentionMs, topic.CleanupPolicy)
 				}
 			case "del":
 				if confirmation {
 					fmt.Println("Deleting topics from broker:", kafkaBroker)
 					topics := getYamlData(topicFile)
-					adminClient := getAdminClient()
 					for _, topic := range topics.Tpcs {
-						topicName := versionize(topic.Name, topicVersion) // COMMAND VERSIONIZER
-						deleteTopic(adminClient, topicName)
+						topic.Name = versionize(topic.Name, topicVersion) // COMMAND VERSIONIZER
+						deleteTopic(adminClient, topic.Name)
 					}
 				}
 			case "list":
 				fmt.Println("Listing topics for broker:", kafkaBroker)
-				adminClient := getAdminClient()
 				topics := getTopicsFromBroker(adminClient)
 				listTopics(topics)
 			case "search":
@@ -77,7 +73,6 @@ func initApp() {
 					var filter string
 					filter = c.Args().Get(0)
 					fmt.Printf("Searching *%s* topics for broker: %s \n", filter, kafkaBroker)
-					adminClient := getAdminClient()
 					topics := getTopicsFromBroker(adminClient)
 					var filteredTopics []string
 					for _, topic := range topics {
@@ -90,7 +85,6 @@ func initApp() {
 			case "clean":
 				if confirmation {
 						fmt.Println("Cleaning topics for broker:", kafkaBroker)
-						adminClient := getAdminClient()
 						topics := getTopicsFromBroker(adminClient)
 						for _, topic := range topics {
 							deleteTopic(adminClient, topic)
