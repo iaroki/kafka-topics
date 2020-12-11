@@ -16,7 +16,7 @@ var kafkaPass = os.Getenv("KAFKA_PASS")
 
 func initApp() {
 
-	var action,topicFile string
+	var action, topicFile string
 	var confirmation bool
 
 	app := &cli.App{
@@ -53,7 +53,8 @@ func initApp() {
 				topics := getYamlData(topicFile)
 				for _, topic := range topics.Tpcs {
 					topic.Name = versionize(topic.Name, topicVersion) // COMMAND VERSIONIZER
-					createTopic(adminClient, topic.Name, topic.Partitions, topic.ReplicationFactor, topic.RetentionMs, topic.CleanupPolicy)
+					//createTopic(adminClient, topic.Name, topic.Partitions, topic.ReplicationFactor, topic.RetentionMs, topic.CleanupPolicy)
+					createTopic(adminClient, topic)
 				}
 			case "del":
 				if confirmation {
@@ -84,10 +85,10 @@ func initApp() {
 				}
 			case "clean":
 				if confirmation {
-						fmt.Println("Cleaning topics for broker:", kafkaBroker)
-						topics := getTopicsFromBroker(adminClient)
-						for _, topic := range topics {
-							deleteTopic(adminClient, topic)
+					fmt.Println("Cleaning topics for broker:", kafkaBroker)
+					topics := getTopicsFromBroker(adminClient)
+					for _, topic := range topics {
+						deleteTopic(adminClient, topic)
 					}
 				}
 			default:

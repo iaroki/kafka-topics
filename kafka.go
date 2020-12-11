@@ -32,9 +32,15 @@ func listTopics(topics []string) {
 	}
 }
 
-func createTopic(adminClient *kafka.AdminClient, name string, partitions int, replicationFactor int, retention string, cleanupPolicy string) {
-	topicConfig := map[string]string{"retention.ms": retention, "cleanup.policy": cleanupPolicy}
-	topicSpec := kafka.TopicSpecification{Topic: name, NumPartitions: partitions, ReplicationFactor: replicationFactor, Config: topicConfig}
+func createTopic(adminClient *kafka.AdminClient, topic Topic) {
+	topicConfig := map[string]string{
+		"retention.ms":   topic.RetentionMs,
+		"cleanup.policy": topic.CleanupPolicy}
+	topicSpec := kafka.TopicSpecification{
+		Topic:             topic.Name,
+		NumPartitions:     topic.Partitions,
+		ReplicationFactor: topic.ReplicationFactor,
+		Config:            topicConfig}
 	topicSpecs := []kafka.TopicSpecification{topicSpec}
 	result, err := adminClient.CreateTopics(context.Background(), topicSpecs)
 
