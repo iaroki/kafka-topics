@@ -9,13 +9,16 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
-func getAdminClient() *kafka.AdminClient {
+func getAdminClient(brokerConfig Config) *kafka.AdminClient {
 	adminClient, err := kafka.NewAdminClient(&kafka.ConfigMap{
-		"bootstrap.servers": kafkaBroker,
-		"sasl.mechanisms":   "PLAIN",
-		"security.protocol": "SASL_PLAINTEXT",
-		"sasl.username":     kafkaUser,
-		"sasl.password":     kafkaPass})
+		"bootstrap.servers": brokerConfig.BootstrapServers,
+		"sasl.mechanism":    brokerConfig.SaslMechanism,
+		"security.protocol": brokerConfig.SecurityProtocol,
+		"ssl.ca.location":   brokerConfig.SslTruststoreLocation,
+		"sasl.username":     brokerConfig.KafkaUsername,
+		"sasl.password":     brokerConfig.KafkaPassword,
+		"group.id":          brokerConfig.KafkaConsumerGroup,
+		"auto.offset.reset": brokerConfig.AutoOffsetReset})
 
 	if err != nil {
 		log.Fatalf("Failed to create AdminClient: %s", err)
@@ -77,4 +80,48 @@ func getTopicsFromBroker(adminClient *kafka.AdminClient) []string {
 	}
 
 	return topicsMetadata
+}
+
+func getConsumerClient(consumerConfig Config) *kafka.Consumer {
+
+	consumerClient, err := kafka.NewConsumer(&kafka.ConfigMap{
+		"bootstrap.servers": consumerConfig.BootstrapServers,
+		"sasl.mechanism":    consumerConfig.SaslMechanism,
+		"security.protocol": consumerConfig.SecurityProtocol,
+		"ssl.ca.location":   consumerConfig.SslTruststoreLocation,
+		"sasl.username":     consumerConfig.KafkaUsername,
+		"sasl.password":     consumerConfig.KafkaPassword,
+		"group.id":          consumerConfig.KafkaConsumerGroup,
+		"auto.offset.reset": consumerConfig.AutoOffsetReset})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return consumerClient
+
+}
+
+func consumeMessages(consumerClient *kafka.Consumer, topic []string) {
+	err := consumerClient.SubscribeTopics(topic, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	run := true
+
+	for run == true {
+		ev := consumerClient.Poll(0)
+		switch e := ev.(type) {
+		case *kafka.Message:
+			fmt.Println(string(e.Value))
+		case kafka.Error:
+			fmt.Println("ERROR: ", e)
+			run = false
+		}
+	}
+
+	err = consumerClient.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
