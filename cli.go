@@ -10,7 +10,7 @@ import (
 
 func initApp() {
 
-	var action, topicFile string
+	var action, topicFile, configFile, topicName string
 	var confirmation bool
 
 	app := &cli.App{
@@ -31,6 +31,20 @@ func initApp() {
 				Destination: &action,
 				Required:    true,
 			},
+			&cli.StringFlag{
+				Name:        "config",
+				Aliases:     []string{"c"},
+				Usage:       "consumer config `config.yaml`",
+				Destination: &configFile,
+				Required:    true,
+			},
+			&cli.StringFlag{
+				Name:        "topic",
+				Aliases:     []string{"t"},
+				Usage:       "topic name to consume `userEvents`",
+				Destination: &topicName,
+				Required:    false,
+			},
 			&cli.BoolFlag{
 				Name:        "yes",
 				Aliases:     []string{"y"},
@@ -40,51 +54,78 @@ func initApp() {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			adminClient := getAdminClient()
+
+			appConfig := getConfig(configFile)
+			adminClient := getAdminClient(appConfig)
+			consumerClient := getConsumerClient(appConfig)
+
 			switch action {
+
 			case "add":
-				fmt.Println("Adding topics to broker:", kafkaBroker)
+				fmt.Println("Adding topics to broker:", appConfig.BootstrapServers)
 				topics := getYamlData(topicFile)
+
 				for _, topic := range topics.Tpcs {
 					topic.Name = versionize(topic.Name, topicVersion) // COMMAND VERSIONIZER
-					//createTopic(adminClient, topic.Name, topic.Partitions, topic.ReplicationFactor, topic.RetentionMs, topic.CleanupPolicy)
 					createTopic(adminClient, topic)
 				}
+
 			case "del":
 				if confirmation {
-					fmt.Println("Deleting topics from broker:", kafkaBroker)
+					fmt.Println("Deleting topics from broker:", appConfig.BootstrapServers)
 					topics := getYamlData(topicFile)
+
 					for _, topic := range topics.Tpcs {
 						topic.Name = versionize(topic.Name, topicVersion) // COMMAND VERSIONIZER
 						deleteTopic(adminClient, topic.Name)
 					}
 				}
+
 			case "list":
-				fmt.Println("Listing topics for broker:", kafkaBroker)
+				fmt.Println("Listing topics for broker:", appConfig.BootstrapServers)
 				topics := getTopicsFromBroker(adminClient)
 				listTopics(topics)
+
 			case "search":
 				if c.NArg() > 0 {
 					var filter string
+
 					filter = c.Args().Get(0)
-					fmt.Printf("Searching *%s* topics for broker: %s \n", filter, kafkaBroker)
+					fmt.Printf("Searching *%s* topics for broker: %s \n", filter, appConfig.BootstrapServers)
 					topics := getTopicsFromBroker(adminClient)
+
 					var filteredTopics []string
+
 					for _, topic := range topics {
 						if strings.Contains(topic, filter) {
 							filteredTopics = append(filteredTopics, topic)
 						}
 					}
+
 					listTopics(filteredTopics)
 				}
+
 			case "clean":
 				if confirmation {
-					fmt.Println("Cleaning topics for broker:", kafkaBroker)
+					fmt.Println("Cleaning topics for broker:", appConfig.BootstrapServers)
 					topics := getTopicsFromBroker(adminClient)
+
 					for _, topic := range topics {
 						deleteTopic(adminClient, topic)
 					}
 				}
+
+			case "consume":
+				var topic string
+
+				if topicName != "" {
+					topic = topicName
+				} else {
+					topic = appConfig.KafkaTopic
+				}
+
+				consumeMessages(consumerClient, []string{topic})
+
 			default:
 				fmt.Println("Wrong arguments... Try help")
 			}
