@@ -16,9 +16,7 @@ func getAdminClient(brokerConfig Config) *kafka.AdminClient {
 		"security.protocol": brokerConfig.SecurityProtocol,
 		"ssl.ca.location":   brokerConfig.SslTruststoreLocation,
 		"sasl.username":     brokerConfig.KafkaUsername,
-		"sasl.password":     brokerConfig.KafkaPassword,
-		"group.id":          brokerConfig.KafkaConsumerGroup,
-		"auto.offset.reset": brokerConfig.AutoOffsetReset})
+		"sasl.password":     brokerConfig.KafkaPassword})
 
 	if err != nil {
 		log.Fatalf("Failed to create AdminClient: %s", err)

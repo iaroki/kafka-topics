@@ -7,15 +7,17 @@ import (
 )
 
 type Config struct {
-	BootstrapServers      string `yaml:"bootstrap.servers"`
-	SaslMechanism         string `yaml:"sasl.mechanism"`
-	SecurityProtocol      string `yaml:"security.protocol"`
-	SslTruststoreLocation string `yaml:"ssl.truststore.location"`
-	KafkaUsername         string `yaml:"kafka.username"`
-	KafkaPassword         string `yaml:"kafka.password"`
-	KafkaTopic            string `yaml:"kafka.topic"`
-	KafkaConsumerGroup    string `yaml:"kafka.consumer.group"`
-	AutoOffsetReset       string `yaml:"auto.offset.reset"`
+	BootstrapServers       string `yaml:"bootstrap.servers"`
+	SaslMechanism          string `yaml:"sasl.mechanism"`
+	SecurityProtocol       string `yaml:"security.protocol"`
+	SslTruststoreLocation  string `yaml:"ssl.truststore.location"`
+	KafkaUsername          string `yaml:"kafka.username"`
+	KafkaPassword          string `yaml:"kafka.password"`
+	KafkaTopic             string `yaml:"kafka.topic"`
+	KafkaConsumerGroup     string `yaml:"kafka.consumer.group"`
+	AutoOffsetReset        string `yaml:"auto.offset.reset"`
+	TopicVersioningEnabled bool   `yaml:"topic.versioning.enabled"`
+	TopicVersion           int    `yaml:"topic.version"`
 }
 
 func getConfig(configFilePath string) Config {

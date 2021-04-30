@@ -5,6 +5,7 @@ import (
 	"github.com/urfave/cli/v2"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -66,7 +67,7 @@ func initApp() {
 				topics := getYamlData(topicFile)
 
 				for _, topic := range topics.Tpcs {
-					topic.Name = versionize(topic.Name, topicVersion) // COMMAND VERSIONIZER
+					topic.Name = versionize(topic.Name, appConfig.TopicVersioningEnabled, strconv.Itoa(appConfig.TopicVersion)) // COMMAND VERSIONIZER
 					createTopic(adminClient, topic)
 				}
 
@@ -74,9 +75,8 @@ func initApp() {
 				if confirmation {
 					fmt.Println("Deleting topics from broker:", appConfig.BootstrapServers)
 					topics := getYamlData(topicFile)
-
 					for _, topic := range topics.Tpcs {
-						topic.Name = versionize(topic.Name, topicVersion) // COMMAND VERSIONIZER
+						topic.Name = versionize(topic.Name, appConfig.TopicVersioningEnabled, strconv.Itoa(appConfig.TopicVersion)) // COMMAND VERSIONIZER
 						deleteTopic(adminClient, topic.Name)
 					}
 				}

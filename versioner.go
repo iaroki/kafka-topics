@@ -4,10 +4,12 @@ import (
 	"strings"
 )
 
-func versionize(topic string, version string) string {
+func versionize(topic string, enabled bool, version string) string {
 
-	if strings.HasSuffix(topic, "Commands") {
-		topic = topic + "_v" + version
+	if enabled {
+		if strings.HasSuffix(topic, "Commands") {
+			topic = topic + "_v" + version
+		}
 	}
 
 	return topic

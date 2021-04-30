@@ -7,3 +7,5 @@ kafka.password: pass
 kafka.topic: mytopic
 kafka.consumer.group: m2
 auto.offset.reset: earliest
+topic.versioning.enabled: true
+topic.version: 16
