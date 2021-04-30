@@ -46,6 +46,13 @@ func initApp() {
 				Destination: &topicName,
 				Required:    false,
 			},
+			&cli.StringFlag{
+				Name:        "version",
+				Aliases:     []string{"v"},
+				Usage:       "version of Commands topics",
+				Destination: &topicVersion,
+				Required:    false,
+			},
 			&cli.BoolFlag{
 				Name:        "yes",
 				Aliases:     []string{"y"},
@@ -66,8 +73,16 @@ func initApp() {
 				fmt.Println("Adding topics to broker:", appConfig.BootstrapServers)
 				topics := getYamlData(topicFile)
 
+				var version string
+
+				if topicVersion != "" {
+					version = topicVersion
+				} else {
+					version = strconv.Itoa(appConfig.TopicVersion)
+				}
+
 				for _, topic := range topics.Tpcs {
-					topic.Name = versionize(topic.Name, appConfig.TopicVersioningEnabled, strconv.Itoa(appConfig.TopicVersion)) // COMMAND VERSIONIZER
+					topic.Name = versionize(topic.Name, appConfig.TopicVersioningEnabled, version) // COMMAND VERSIONIZER
 					createTopic(adminClient, topic)
 				}
 
@@ -75,8 +90,17 @@ func initApp() {
 				if confirmation {
 					fmt.Println("Deleting topics from broker:", appConfig.BootstrapServers)
 					topics := getYamlData(topicFile)
+
+					var version string
+
+					if topicVersion != "" {
+						version = topicVersion
+					} else {
+						version = strconv.Itoa(appConfig.TopicVersion)
+					}
+
 					for _, topic := range topics.Tpcs {
-						topic.Name = versionize(topic.Name, appConfig.TopicVersioningEnabled, strconv.Itoa(appConfig.TopicVersion)) // COMMAND VERSIONIZER
+						topic.Name = versionize(topic.Name, appConfig.TopicVersioningEnabled, version) // COMMAND VERSIONIZER
 						deleteTopic(adminClient, topic.Name)
 					}
 				}
