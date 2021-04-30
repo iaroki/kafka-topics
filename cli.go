@@ -11,7 +11,7 @@ import (
 
 func initApp() {
 
-	var action, topicFile, configFile, topicName string
+	var action, topicFile, configFile, topicName, topicVersion string
 	var confirmation bool
 
 	app := &cli.App{
