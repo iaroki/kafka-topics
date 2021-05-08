@@ -148,8 +148,13 @@ func initApp() {
 					topic = appConfig.KafkaTopic
 				}
 
-				consumerSubscribed := getConsumerSubscribed(consumerClient, []string{topic})
-				consumeMessages(consumerSubscribed)
+				if appConfig.KafkaTopicSubscribe {
+					consumerSubscribed := getConsumerSubscribed(consumerClient, []string{topic})
+					consumeMessages(consumerSubscribed)
+				} else {
+					consumerAssigned := getConsumerAssigned(consumerClient, topic)
+					consumeMessages(consumerAssigned)
+				}
 
 			default:
 				fmt.Println("Wrong arguments... Try help")

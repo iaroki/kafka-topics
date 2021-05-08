@@ -14,6 +14,7 @@ type Config struct {
 	KafkaUsername          string `yaml:"kafka.username"`
 	KafkaPassword          string `yaml:"kafka.password"`
 	KafkaTopic             string `yaml:"kafka.topic"`
+	KafkaTopicSubscribe    bool   `yaml:"kafka.topic.subscribe"`
 	KafkaConsumerGroup     string `yaml:"kafka.consumer.group"`
 	AutoOffsetReset        string `yaml:"auto.offset.reset"`
 	TopicVersioningEnabled bool   `yaml:"topic.versioning.enabled"`

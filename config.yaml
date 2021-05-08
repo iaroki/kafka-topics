@@ -5,6 +5,7 @@ ssl.truststore.location:
 kafka.username: user
 kafka.password: pass
 kafka.topic: mytopic
+kafka.topic.subscribe: true
 kafka.consumer.group: m2
 auto.offset.reset: earliest
 topic.versioning.enabled: true
