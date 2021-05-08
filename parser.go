@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 )
 
-type Topic struct {
+type yamlTopic struct {
 	Name              string `yaml:"name"`
 	Partitions        int    `yaml:"partitions"`
 	ReplicationFactor int    `yaml:"replicationFactor"`
@@ -14,18 +14,18 @@ type Topic struct {
 	CleanupPolicy     string `yaml:"cleanupPolicy,omitempty"`
 }
 
-type Topics struct {
-	Tpcs []Topic `yaml:"topics"`
+type yamlTopics struct {
+	Topics []yamlTopic `yaml:"topics"`
 }
 
-func getYamlData(fileName string) Topics {
+func getYamlData(fileName string) yamlTopics {
 
 	yamlFile, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		fmt.Printf("Error reading YAML file: %s\n", err)
 	}
 
-	var topics Topics
+	var topics yamlTopics
 	err = yaml.Unmarshal(yamlFile, &topics)
 	if err != nil {
 		fmt.Printf("Error parsing YAML file: %s\n", err)
