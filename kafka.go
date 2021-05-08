@@ -108,6 +108,25 @@ func getConsumerSubscribed(consumerClient *kafka.Consumer, topics []string) *kaf
 	return consumerClient
 }
 
+func getConsumerAssigned(consumerClient *kafka.Consumer, topic string) *kafka.Consumer {
+
+	parts := []int32{19, 20}
+	var ktps []kafka.TopicPartition
+
+	for _, part := range parts {
+		fmt.Println(part)
+		tp := kafka.TopicPartition{Topic: &topic, Partition: int32(part)}
+		ktps = append(ktps, tp)
+	}
+
+	err := consumerClient.Assign(ktps)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return consumerClient
+}
+
 func consumeMessages(consumerClient *kafka.Consumer) {
 
 	run := true
