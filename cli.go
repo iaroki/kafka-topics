@@ -81,7 +81,7 @@ func initApp() {
 					version = strconv.Itoa(appConfig.TopicVersion)
 				}
 
-				for _, topic := range topics.Tpcs {
+				for _, topic := range topics.Topics {
 					topic.Name = versionize(topic.Name, appConfig.TopicVersioningEnabled, version) // COMMAND VERSIONIZER
 					createTopic(adminClient, topic)
 				}
@@ -99,7 +99,7 @@ func initApp() {
 						version = strconv.Itoa(appConfig.TopicVersion)
 					}
 
-					for _, topic := range topics.Tpcs {
+					for _, topic := range topics.Topics {
 						topic.Name = versionize(topic.Name, appConfig.TopicVersioningEnabled, version) // COMMAND VERSIONIZER
 						deleteTopic(adminClient, topic.Name)
 					}
