@@ -33,7 +33,7 @@ func listTopics(topics []string) {
 	}
 }
 
-func createTopic(adminClient *kafka.AdminClient, topic Topic) {
+func createTopic(adminClient *kafka.AdminClient, topic yamlTopic) {
 	topicConfig := map[string]string{
 		"retention.ms":   topic.RetentionMs,
 		"cleanup.policy": topic.CleanupPolicy}
@@ -99,11 +99,16 @@ func getConsumerClient(consumerConfig Config) *kafka.Consumer {
 
 }
 
-func consumeMessages(consumerClient *kafka.Consumer, topic []string) {
-	err := consumerClient.SubscribeTopics(topic, nil)
+func getConsumerSubscribed(consumerClient *kafka.Consumer, topics []string) *kafka.Consumer {
+	err := consumerClient.SubscribeTopics(topics, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	return consumerClient
+}
+
+func consumeMessages(consumerClient *kafka.Consumer) {
 
 	run := true
 
@@ -118,8 +123,4 @@ func consumeMessages(consumerClient *kafka.Consumer, topic []string) {
 		}
 	}
 
-	err = consumerClient.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
 }
