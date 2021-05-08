@@ -80,6 +80,19 @@ func getTopicsFromBroker(adminClient *kafka.AdminClient) []string {
 	return topicsMetadata
 }
 
+func getTopicPartitions(adminClient *kafka.AdminClient, topic string) []kafka.PartitionMetadata {
+	metadata, err := adminClient.GetMetadata(&topic, false, 5000)
+
+	if err != nil {
+		log.Fatalf("Metadata error: %s", err)
+	}
+
+	partsMetadata := metadata.Topics[topic].Partitions
+
+	return partsMetadata
+
+}
+
 func getConsumerClient(consumerConfig Config) *kafka.Consumer {
 
 	consumerClient, err := kafka.NewConsumer(&kafka.ConfigMap{
@@ -109,17 +122,19 @@ func getConsumerSubscribed(consumerClient *kafka.Consumer, topics []string) *kaf
 }
 
 func getConsumerAssigned(consumerClient *kafka.Consumer, topic string) *kafka.Consumer {
-
-	parts := []int32{19, 20}
-	var ktps []kafka.TopicPartition
-
-	for _, part := range parts {
-		fmt.Println(part)
-		tp := kafka.TopicPartition{Topic: &topic, Partition: int32(part)}
-		ktps = append(ktps, tp)
+	adminClient, err := kafka.NewAdminClientFromConsumer(consumerClient)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	err := consumerClient.Assign(ktps)
+	partitionsMetadata := getTopicPartitions(adminClient, topic)
+	var topicPartitions []kafka.TopicPartition
+	for part := range partitionsMetadata {
+		tp := kafka.TopicPartition{Topic: &topic, Partition: int32(part)}
+		topicPartitions = append(topicPartitions, tp)
+	}
+
+	err = consumerClient.Assign(topicPartitions)
 	if err != nil {
 		log.Fatal(err)
 	}
