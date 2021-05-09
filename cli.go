@@ -17,7 +17,7 @@ func initApp() {
 
 	app := &cli.App{
 		Name:  "kafka-topics",
-		Usage: "manage Kafka topics",
+		Usage: "CLI tool for Kafka topics management",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "file",
