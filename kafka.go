@@ -161,4 +161,8 @@ func consumeMessages(consumerClient *kafka.Consumer, consumeMessageNumber int) {
 		}
 	}
 
+	err := consumerClient.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
