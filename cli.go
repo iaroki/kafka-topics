@@ -52,7 +52,6 @@ func initApp() {
 				Aliases:     []string{"m"},
 				Usage:       "Number of messages to consume: `10`",
 				Destination: &consumeMessagesCounter,
-				Value:       -1,
 				Required:    false,
 			},
 			&cli.StringFlag{
@@ -168,7 +167,7 @@ func initApp() {
 					topic = appConfig.KafkaTopic
 				}
 
-				if &consumeMessagesCounter != nil {
+				if consumeMessagesCounter != 0 {
 					messages = consumeMessagesCounter
 				} else {
 					messages = appConfig.ConsumeMessagesCounter
