@@ -73,14 +73,13 @@ func initApp() {
 		Action: func(c *cli.Context) error {
 
 			appConfig := getConfig(configFile)
-			adminClient := getAdminClient(appConfig)
-			consumerClient := getConsumerClient(appConfig)
 
 			switch action {
 
 			case "add":
 				fmt.Println("Adding topics to broker:", appConfig.BootstrapServers)
 				topics := getYamlData(topicFile)
+				adminClient := getAdminClient(appConfig)
 
 				var version string
 
@@ -99,6 +98,7 @@ func initApp() {
 				if confirmation {
 					fmt.Println("Deleting topics from broker:", appConfig.BootstrapServers)
 					topics := getYamlData(topicFile)
+					adminClient := getAdminClient(appConfig)
 
 					var version string
 
@@ -118,6 +118,7 @@ func initApp() {
 
 			case "list":
 				fmt.Println("Listing topics for broker:", appConfig.BootstrapServers)
+				adminClient := getAdminClient(appConfig)
 				topics := getTopicsFromBroker(adminClient)
 				listTopics(topics)
 
@@ -127,6 +128,7 @@ func initApp() {
 
 					filter = c.Args().Get(0)
 					fmt.Printf("Searching *%s* topics for broker: %s \n", filter, appConfig.BootstrapServers)
+					adminClient := getAdminClient(appConfig)
 					topics := getTopicsFromBroker(adminClient)
 
 					var filteredTopics []string
@@ -138,11 +140,14 @@ func initApp() {
 					}
 
 					listTopics(filteredTopics)
+				} else {
+					fmt.Println("Add some arguments for search")
 				}
 
 			case "clean":
 				if confirmation {
 					fmt.Println("Cleaning topics for broker:", appConfig.BootstrapServers)
+					adminClient := getAdminClient(appConfig)
 					topics := getTopicsFromBroker(adminClient)
 
 					for _, topic := range topics {
@@ -153,6 +158,7 @@ func initApp() {
 				}
 
 			case "consume":
+				consumerClient := getConsumerClient(appConfig)
 				var topic string
 				var messages int
 
