@@ -150,10 +150,10 @@ func initApp() {
 
 				if appConfig.KafkaTopicSubscribe {
 					consumerSubscribed := getConsumerSubscribed(consumerClient, []string{topic})
-					consumeMessages(consumerSubscribed)
+					consumeMessages(consumerSubscribed, appConfig.ConsumeMessageNumber)
 				} else {
 					consumerAssigned := getConsumerAssigned(consumerClient, topic)
-					consumeMessages(consumerAssigned)
+					consumeMessages(consumerAssigned, appConfig.ConsumeMessageNumber)
 				}
 
 			default:
