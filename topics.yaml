@@ -4,16 +4,11 @@ topics:
     replicationFactor: 3
     retentionMs: 604800000
     cleanupPolicy: compact
-#
-#  - name: uberEvents
-#    partitions: 60
-#    replicationFactor: 3
-#    retentionMs: -1
-#
-#  - name: uberEvents
-#    partitions: 60
-#    replicationFactor: 3
-#    retentionMs: -1
+
+  - name: uberEvents
+    partitions: 60
+    replicationFactor: 3
+    retentionMs: -1
 
   - name: uberNotifications
     partitions: 60
