@@ -10,4 +10,4 @@ kafka.consumer.group: m2
 auto.offset.reset: earliest
 topic.versioning.enabled: true
 topic.version: 16
-consume.message.number: -1
+consume.messages.counter: -1

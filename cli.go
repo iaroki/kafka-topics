@@ -13,6 +13,7 @@ func initApp() {
 
 	var action, topicFile, configFile, topicName, topicVersion string
 	var confirmation bool
+	var consumeMessagesCounter int
 
 	app := &cli.App{
 		Name:  "kafka-topics",
@@ -44,6 +45,13 @@ func initApp() {
 				Aliases:     []string{"t"},
 				Usage:       "topic name to consume `userEvents`",
 				Destination: &topicName,
+				Required:    false,
+			},
+			&cli.IntFlag{
+				Name:        "messages",
+				Aliases:     []string{"m"},
+				Usage:       "number of messages to consume `10`",
+				Destination: &consumeMessagesCounter,
 				Required:    false,
 			},
 			&cli.StringFlag{
@@ -141,6 +149,7 @@ func initApp() {
 
 			case "consume":
 				var topic string
+				var messages int
 
 				if topicName != "" {
 					topic = topicName
@@ -148,12 +157,18 @@ func initApp() {
 					topic = appConfig.KafkaTopic
 				}
 
+				if &consumeMessagesCounter != nil {
+					messages = consumeMessagesCounter
+				} else {
+					messages = appConfig.ConsumeMessagesCounter
+				}
+
 				if appConfig.KafkaTopicSubscribe {
 					consumerSubscribed := getConsumerSubscribed(consumerClient, []string{topic})
-					consumeMessages(consumerSubscribed, appConfig.ConsumeMessageNumber)
+					consumeMessages(consumerSubscribed, messages)
 				} else {
 					consumerAssigned := getConsumerAssigned(consumerClient, topic)
-					consumeMessages(consumerAssigned, appConfig.ConsumeMessageNumber)
+					consumeMessages(consumerAssigned, messages)
 				}
 
 			default:

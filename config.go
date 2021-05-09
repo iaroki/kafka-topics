@@ -19,7 +19,7 @@ type Config struct {
 	AutoOffsetReset        string `yaml:"auto.offset.reset"`
 	TopicVersioningEnabled bool   `yaml:"topic.versioning.enabled"`
 	TopicVersion           int    `yaml:"topic.version"`
-	ConsumeMessageNumber   int    `yaml:"consume.message.number"`
+	ConsumeMessagesCounter int    `yaml:"consume.messages.counter"`
 }
 
 func getConfig(configFilePath string) Config {

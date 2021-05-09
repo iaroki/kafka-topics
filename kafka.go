@@ -142,7 +142,7 @@ func getConsumerAssigned(consumerClient *kafka.Consumer, topic string) *kafka.Co
 	return consumerClient
 }
 
-func consumeMessages(consumerClient *kafka.Consumer, consumeMessageNumber int) {
+func consumeMessages(consumerClient *kafka.Consumer, consumeMessagesCounter int) {
 
 	run := true
 	counter := 0
@@ -152,7 +152,7 @@ func consumeMessages(consumerClient *kafka.Consumer, consumeMessageNumber int) {
 		case *kafka.Message:
 			counter++
 			fmt.Println(string(e.Value), counter)
-			if counter == consumeMessageNumber {
+			if counter == consumeMessagesCounter {
 				run = false
 			}
 		case kafka.Error:
