@@ -83,7 +83,7 @@ func initApp() {
 			switch action {
 
 			case "add":
-				fmt.Println("Adding topics to broker:", appConfig.BootstrapServers)
+				fmt.Println("==> Adding topics to broker:", appConfig.BootstrapServers)
 				topics := getYamlData(topicFile)
 				adminClient := getAdminClient(appConfig)
 
@@ -102,7 +102,7 @@ func initApp() {
 
 			case "del":
 				if confirmation {
-					fmt.Println("Deleting topics from broker:", appConfig.BootstrapServers)
+					fmt.Println("==> Deleting topics from broker:", appConfig.BootstrapServers)
 					topics := getYamlData(topicFile)
 					adminClient := getAdminClient(appConfig)
 
@@ -119,11 +119,11 @@ func initApp() {
 						deleteTopic(adminClient, topic.Name)
 					}
 				} else {
-					fmt.Println("Confirm destructive actions")
+					fmt.Println("==> Confirm destructive actions")
 				}
 
 			case "list":
-				fmt.Println("Listing topics for broker:", appConfig.BootstrapServers)
+				fmt.Println("==> Listing topics for broker:", appConfig.BootstrapServers)
 				adminClient := getAdminClient(appConfig)
 				topics := getTopicsFromBroker(adminClient)
 				listTopics(topics)
@@ -133,7 +133,7 @@ func initApp() {
 					var filter string
 
 					filter = c.Args().Get(0)
-					fmt.Printf("Searching *%s* topics for broker: %s \n", filter, appConfig.BootstrapServers)
+					fmt.Printf("==> Searching *%s* topics for broker: %s \n", filter, appConfig.BootstrapServers)
 					adminClient := getAdminClient(appConfig)
 					topics := getTopicsFromBroker(adminClient)
 
@@ -148,22 +148,22 @@ func initApp() {
 					listTopics(filteredTopics)
 
 					if destruction {
-						fmt.Printf("\nThis topics selected for destruction\n")
+						fmt.Printf("\n==> Topics selected for destruction\n")
 						if confirmation {
 							for _, topic := range filteredTopics {
 								deleteTopic(adminClient, topic)
 							}
 						} else {
-							fmt.Println("Confirm destructive actions")
+							fmt.Println("==> Confirm destructive actions")
 						}
 					}
 				} else {
-					fmt.Println("Add some arguments for search")
+					fmt.Println("==> Add some arguments for search")
 				}
 
 			case "clean":
 				if confirmation {
-					fmt.Println("Cleaning topics for broker:", appConfig.BootstrapServers)
+					fmt.Println("==> Cleaning topics for broker:", appConfig.BootstrapServers)
 					adminClient := getAdminClient(appConfig)
 					topics := getTopicsFromBroker(adminClient)
 
@@ -171,7 +171,7 @@ func initApp() {
 						deleteTopic(adminClient, topic)
 					}
 				} else {
-					fmt.Println("Confirm destructive actions")
+					fmt.Println("==> Confirm destructive actions")
 				}
 
 			case "consume":
@@ -200,7 +200,7 @@ func initApp() {
 				}
 
 			default:
-				fmt.Println("Wrong arguments... Try help")
+				fmt.Println("==> Wrong arguments... Try help")
 			}
 
 			return nil

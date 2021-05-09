@@ -19,11 +19,31 @@ func getAdminClient(brokerConfig Config) *kafka.AdminClient {
 		"sasl.password":     brokerConfig.KafkaPassword})
 
 	if err != nil {
-		log.Fatalf("Failed to create AdminClient: %s", err)
+		log.Fatalf("==> Failed to create AdminClient: %s", err)
 	}
 
 	return adminClient
 }
+
+func getConsumerClient(consumerConfig Config) *kafka.Consumer {
+
+	consumerClient, err := kafka.NewConsumer(&kafka.ConfigMap{
+		"bootstrap.servers": consumerConfig.BootstrapServers,
+		"sasl.mechanism":    consumerConfig.SaslMechanism,
+		"security.protocol": consumerConfig.SecurityProtocol,
+		"ssl.ca.location":   consumerConfig.SslTruststoreLocation,
+		"sasl.username":     consumerConfig.KafkaUsername,
+		"sasl.password":     consumerConfig.KafkaPassword,
+		"group.id":          consumerConfig.KafkaConsumerGroup,
+		"auto.offset.reset": consumerConfig.AutoOffsetReset})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return consumerClient
+
+}
+
 func listTopics(topics []string) {
 
 	sort.Strings(topics)
@@ -46,10 +66,10 @@ func createTopic(adminClient *kafka.AdminClient, topic yamlTopic) {
 	result, err := adminClient.CreateTopics(context.Background(), topicSpecs)
 
 	if err != nil {
-		log.Fatalf("Topic create error: %s", err)
+		log.Fatalf("==> Topic create error: %s", err)
 	}
 
-	fmt.Printf("Creating %s... %s\n", result[0].Topic, result[0].Error)
+	fmt.Printf("==> Creating %s... %s\n", result[0].Topic, result[0].Error)
 }
 
 func deleteTopic(adminClient *kafka.AdminClient, name string) {
@@ -57,17 +77,17 @@ func deleteTopic(adminClient *kafka.AdminClient, name string) {
 	result, err := adminClient.DeleteTopics(context.Background(), topics)
 
 	if err != nil {
-		log.Fatalf("Topic delete error: %s", err)
+		log.Fatalf("==> Topic delete error: %s", err)
 	}
 
-	fmt.Printf("Deleting %s... %s\n", result[0].Topic, result[0].Error)
+	fmt.Printf("==> Deleting %s... %s\n", result[0].Topic, result[0].Error)
 }
 
 func getTopicsFromBroker(adminClient *kafka.AdminClient) []string {
 	metadata, err := adminClient.GetMetadata(nil, true, 5000)
 
 	if err != nil {
-		log.Fatalf("Metadata error: %s", err)
+		log.Fatalf("==> Metadata error: %s", err)
 	}
 
 	var topicsMetadata []string
@@ -84,31 +104,12 @@ func getTopicPartitions(adminClient *kafka.AdminClient, topic string) []kafka.Pa
 	metadata, err := adminClient.GetMetadata(&topic, false, 5000)
 
 	if err != nil {
-		log.Fatalf("Metadata error: %s", err)
+		log.Fatalf("==> Metadata error: %s", err)
 	}
 
 	partsMetadata := metadata.Topics[topic].Partitions
 
 	return partsMetadata
-
-}
-
-func getConsumerClient(consumerConfig Config) *kafka.Consumer {
-
-	consumerClient, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers": consumerConfig.BootstrapServers,
-		"sasl.mechanism":    consumerConfig.SaslMechanism,
-		"security.protocol": consumerConfig.SecurityProtocol,
-		"ssl.ca.location":   consumerConfig.SslTruststoreLocation,
-		"sasl.username":     consumerConfig.KafkaUsername,
-		"sasl.password":     consumerConfig.KafkaPassword,
-		"group.id":          consumerConfig.KafkaConsumerGroup,
-		"auto.offset.reset": consumerConfig.AutoOffsetReset})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return consumerClient
 
 }
 

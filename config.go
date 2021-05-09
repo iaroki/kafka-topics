@@ -26,14 +26,14 @@ func getConfig(configFilePath string) Config {
 
 	yamlFile, err := ioutil.ReadFile(configFilePath)
 	if err != nil {
-		fmt.Printf("Error reading YAML file: %s\n", err)
+		fmt.Printf("==> Error reading YAML file: %s\n", err)
 	}
 
 	var appConfig Config
 
 	err = yaml.Unmarshal(yamlFile, &appConfig)
 	if err != nil {
-		fmt.Printf("Error parsing YAML file: %s\n", err)
+		fmt.Printf("==> Error parsing YAML file: %s\n", err)
 	}
 
 	return appConfig
