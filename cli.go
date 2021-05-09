@@ -22,49 +22,50 @@ func initApp() {
 			&cli.StringFlag{
 				Name:        "file",
 				Aliases:     []string{"f"},
-				Usage:       "YAML formatted file with topics to load `topics.yaml`",
+				Usage:       "YAML formatted file with topics to load: `topics.yaml`",
 				Destination: &topicFile,
 				Required:    false,
 			},
 			&cli.StringFlag{
 				Name:        "action",
 				Aliases:     []string{"a"},
-				Usage:       "Action to take `add | del [force] | list | search [arg] | clean [force] | consume`",
+				Usage:       "Action to take: `add | del [force] | list | search [arg] | clean [force] | consume`",
 				Destination: &action,
 				Required:    true,
 			},
 			&cli.StringFlag{
 				Name:        "config",
 				Aliases:     []string{"c"},
-				Usage:       "YAML formatted configuration file `config.yaml`",
+				Usage:       "YAML formatted configuration file: `config.yaml`",
 				Destination: &configFile,
 				Required:    true,
 			},
 			&cli.StringFlag{
 				Name:        "topic",
 				Aliases:     []string{"t"},
-				Usage:       "Topic name to consume `userEvents`",
+				Usage:       "Topic name to consume: `userEvents`",
 				Destination: &topicName,
 				Required:    false,
 			},
 			&cli.IntFlag{
 				Name:        "messages",
 				Aliases:     []string{"m"},
-				Usage:       "Number of messages to consume `10`",
+				Usage:       "Number of messages to consume: `10`",
 				Destination: &consumeMessagesCounter,
+				Value:       -1,
 				Required:    false,
 			},
 			&cli.StringFlag{
 				Name:        "version",
 				Aliases:     []string{"v"},
-				Usage:       "Version of Commands topics",
+				Usage:       "Version of Commands topics: 16",
 				Destination: &topicVersion,
 				Required:    false,
 			},
 			&cli.BoolFlag{
 				Name:        "yes",
 				Aliases:     []string{"y"},
-				Usage:       "Confirmation for destructive actions `yes`",
+				Usage:       "Confirmation for destructive actions",
 				Destination: &confirmation,
 				Required:    false,
 			},
@@ -111,6 +112,8 @@ func initApp() {
 						topic.Name = versionize(topic.Name, appConfig.TopicVersioningEnabled, version) // COMMAND VERSIONIZER
 						deleteTopic(adminClient, topic.Name)
 					}
+				} else {
+					fmt.Println("Confirm destructive actions")
 				}
 
 			case "list":
@@ -145,6 +148,8 @@ func initApp() {
 					for _, topic := range topics {
 						deleteTopic(adminClient, topic)
 					}
+				} else {
+					fmt.Println("Confirm destructive actions")
 				}
 
 			case "consume":
