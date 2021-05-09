@@ -12,7 +12,7 @@ import (
 func initApp() {
 
 	var action, topicFile, configFile, topicName, topicVersion string
-	var confirmation bool
+	var confirmation, destruction bool
 	var consumeMessagesCounter int
 
 	app := &cli.App{
@@ -66,6 +66,13 @@ func initApp() {
 				Aliases:     []string{"y"},
 				Usage:       "Confirmation for destructive actions",
 				Destination: &confirmation,
+				Required:    false,
+			},
+			&cli.BoolFlag{
+				Name:        "destroy",
+				Aliases:     []string{"d"},
+				Usage:       "Destroy filtered topics",
+				Destination: &destruction,
 				Required:    false,
 			},
 		},
@@ -139,6 +146,17 @@ func initApp() {
 					}
 
 					listTopics(filteredTopics)
+
+					if destruction {
+						fmt.Printf("\nThis topics selected for destruction\n")
+						if confirmation {
+							for _, topic := range filteredTopics {
+								deleteTopic(adminClient, topic)
+							}
+						} else {
+							fmt.Println("Confirm destructive actions")
+						}
+					}
 				} else {
 					fmt.Println("Add some arguments for search")
 				}
