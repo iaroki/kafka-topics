@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"github.com/google/uuid"
 	"log"
 	"os"
 	"sort"
-
-	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
 func getAdminClient(brokerConfig Config) *kafka.AdminClient {
@@ -205,4 +206,32 @@ func consumeMessages(consumerClient *kafka.Consumer, consumeMessagesCounter int)
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func produceMessages(producerClient *kafka.Producer, topic string, messages []string) {
+
+	for _, message := range messages {
+		messageEncoded, err := json.Marshal(message)
+
+		if err != nil {
+			fmt.Printf("Cannot encode message %s", err)
+		}
+
+		fmt.Printf("%s", messageEncoded)
+		err = producerClient.Produce(&kafka.Message{
+			TopicPartition: kafka.TopicPartition{
+				Topic:     &topic,
+				Partition: kafka.PartitionAny,
+			},
+			Key:   []byte(uuid.New().String()),
+			Value: messageEncoded,
+		}, nil)
+
+		if err != nil {
+			fmt.Printf("Cannot produce message %s", err)
+		}
+
+	}
+
+	producerClient.Flush(1000)
 }

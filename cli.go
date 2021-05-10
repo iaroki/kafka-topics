@@ -199,6 +199,18 @@ func initApp() {
 					consumeMessages(consumerAssigned, messages)
 				}
 
+			case "produce":
+				var topic string
+
+				if topicName != "" {
+					topic = topicName
+				} else {
+					topic = appConfig.KafkaTopic
+				}
+				messageData := getMessageData("data.log")
+				producerClient := getProducerClient(appConfig)
+				produceMessages(producerClient, topic, messageData)
+
 			default:
 				fmt.Println("==> Wrong arguments... Try help")
 			}
