@@ -139,6 +139,12 @@ func getTopicPartitions(adminClient *kafka.AdminClient, topic string) []kafka.Pa
 		log.Fatalf("==> Metadata error: %s", err)
 	}
 
+	topicError := metadata.Topics[topic].Error.String()
+
+	if topicError != "Success" {
+		os.Exit(3)
+	}
+
 	partsMetadata := metadata.Topics[topic].Partitions
 
 	return partsMetadata
