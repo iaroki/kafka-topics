@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"sort"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
@@ -48,6 +49,24 @@ func getConsumerClient(consumerConfig Config) *kafka.Consumer {
 
 func getProducerClient(consumerConfig Config) *kafka.Producer {
 
+	hostname, err := os.Hostname()
+	clientId := "kafka-topics-" + hostname
+	producerClient, err := kafka.NewProducer(&kafka.ConfigMap{
+		"bootstrap.servers": consumerConfig.BootstrapServers,
+		"sasl.mechanism":    consumerConfig.SaslMechanism,
+		"security.protocol": consumerConfig.SecurityProtocol,
+		"ssl.ca.location":   consumerConfig.SslTruststoreLocation,
+		"sasl.username":     consumerConfig.KafkaUsername,
+		"sasl.password":     consumerConfig.KafkaPassword,
+		"partitioner":       "murmur2_random",
+		"client.id":         clientId,
+		"acks":              "all"})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return producerClient
 }
 
 func listTopics(topics []string) {
