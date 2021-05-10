@@ -216,16 +216,13 @@ func consumeMessages(consumerClient *kafka.Consumer, consumeMessagesCounter int)
 func produceMessages(producerClient *kafka.Producer, topic string, messages []string) {
 
 	for index, message := range messages {
-
-		messageEncoded := []byte(message)
-
 		err := producerClient.Produce(&kafka.Message{
 			TopicPartition: kafka.TopicPartition{
 				Topic:     &topic,
 				Partition: kafka.PartitionAny,
 			},
 			Key:   []byte(uuid.New().String()),
-			Value: messageEncoded,
+			Value: []byte(message),
 		}, nil)
 
 		if err != nil {
@@ -236,5 +233,5 @@ func produceMessages(producerClient *kafka.Producer, topic string, messages []st
 
 	}
 
-	producerClient.Flush(10000)
+	producerClient.Flush(3000)
 }
