@@ -22,14 +22,14 @@ func initApp() {
 			&cli.StringFlag{
 				Name:        "file",
 				Aliases:     []string{"f"},
-				Usage:       "YAML formatted file with topics to load: `topics.yaml`",
+				Usage:       "File to load: `topics.yaml` or `data.log`",
 				Destination: &topicFile,
 				Required:    false,
 			},
 			&cli.StringFlag{
 				Name:        "action",
 				Aliases:     []string{"a"},
-				Usage:       "Action to take: add | del [force] | list | search [arg] | clean [force] | consume",
+				Usage:       "Action to take: add/del/list/search/clean/consume/produce",
 				Destination: &action,
 				Required:    true,
 			},
@@ -83,6 +83,11 @@ func initApp() {
 			switch action {
 
 			case "add":
+				if topicFile == "" {
+					fmt.Println("Select YAML formatted topics file: `-f topics.yaml`")
+					os.Exit(3)
+				}
+
 				fmt.Println("==> Adding topics to broker:", appConfig.BootstrapServers)
 				topics := getYamlData(topicFile)
 				adminClient := getAdminClient(appConfig)
@@ -101,6 +106,11 @@ func initApp() {
 				}
 
 			case "del":
+				if topicFile == "" {
+					fmt.Println("Select YAML formatted topics file: `-f topics.yaml`")
+					os.Exit(3)
+				}
+
 				if confirmation {
 					fmt.Println("==> Deleting topics from broker:", appConfig.BootstrapServers)
 					topics := getYamlData(topicFile)
@@ -200,6 +210,11 @@ func initApp() {
 				}
 
 			case "produce":
+				if topicFile == "" {
+					fmt.Println("Select data file: `-f data.log`")
+					os.Exit(3)
+				}
+
 				var topic string
 
 				if topicName != "" {
@@ -207,7 +222,7 @@ func initApp() {
 				} else {
 					topic = appConfig.KafkaTopic
 				}
-				messageData := getMessageData("data.log")
+				messageData := getMessageData(topicFile)
 				producerClient := getProducerClient(appConfig)
 				produceMessages(producerClient, topic, messageData)
 
