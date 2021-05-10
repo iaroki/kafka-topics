@@ -84,7 +84,7 @@ func initApp() {
 
 			case "add":
 				if topicFile == "" {
-					fmt.Println("Select YAML formatted topics file: `-f topics.yaml`")
+					fmt.Println("==> Select YAML formatted topics file: `-f topics.yaml`")
 					os.Exit(3)
 				}
 
@@ -107,7 +107,7 @@ func initApp() {
 
 			case "del":
 				if topicFile == "" {
-					fmt.Println("Select YAML formatted topics file: `-f topics.yaml`")
+					fmt.Println("==> Select YAML formatted topics file: `-f topics.yaml`")
 					os.Exit(3)
 				}
 
@@ -201,6 +201,8 @@ func initApp() {
 					messages = appConfig.ConsumeMessagesCounter
 				}
 
+				fmt.Printf("==> Consuming messages from %s at %s\n", topic, appConfig.BootstrapServers)
+
 				if appConfig.KafkaTopicSubscribe {
 					consumerSubscribed := getConsumerSubscribed(consumerClient, []string{topic})
 					consumeMessages(consumerSubscribed, messages)
@@ -211,7 +213,7 @@ func initApp() {
 
 			case "produce":
 				if topicFile == "" {
-					fmt.Println("Select data file: `-f data.log`")
+					fmt.Println("==> Select data file: `-f data.log`")
 					os.Exit(3)
 				}
 
@@ -222,6 +224,9 @@ func initApp() {
 				} else {
 					topic = appConfig.KafkaTopic
 				}
+
+				fmt.Printf("==> Producing messages to %s at %s\n", topic, appConfig.BootstrapServers)
+
 				messageData := getMessageData(topicFile)
 				producerClient := getProducerClient(appConfig)
 				produceMessages(producerClient, topic, messageData)

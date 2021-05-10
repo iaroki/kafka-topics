@@ -226,7 +226,7 @@ func produceMessages(producerClient *kafka.Producer, topic string, messages []st
 		}, nil)
 
 		if err != nil {
-			fmt.Printf("Cannot produce message %s", err)
+			fmt.Printf("==> Cannot produce message %s", err)
 		}
 
 		fmt.Println(message, index+1)
