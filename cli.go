@@ -29,7 +29,7 @@ func initApp() {
 			&cli.StringFlag{
 				Name:        "action",
 				Aliases:     []string{"a"},
-				Usage:       "Action to take: `add | del [force] | list | search [arg] | clean [force] | consume`",
+				Usage:       "Action to take: add | del [force] | list | search [arg] | clean [force] | consume",
 				Destination: &action,
 				Required:    true,
 			},
