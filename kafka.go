@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/google/uuid"
@@ -216,15 +215,11 @@ func consumeMessages(consumerClient *kafka.Consumer, consumeMessagesCounter int)
 
 func produceMessages(producerClient *kafka.Producer, topic string, messages []string) {
 
-	for _, message := range messages {
-		messageEncoded, err := json.Marshal(message)
+	for index, message := range messages {
 
-		if err != nil {
-			fmt.Printf("Cannot encode message %s", err)
-		}
+		messageEncoded := []byte(message)
 
-		fmt.Printf("%s", messageEncoded)
-		err = producerClient.Produce(&kafka.Message{
+		err := producerClient.Produce(&kafka.Message{
 			TopicPartition: kafka.TopicPartition{
 				Topic:     &topic,
 				Partition: kafka.PartitionAny,
@@ -237,7 +232,9 @@ func produceMessages(producerClient *kafka.Producer, topic string, messages []st
 			fmt.Printf("Cannot produce message %s", err)
 		}
 
+		fmt.Println(message, index+1)
+
 	}
 
-	producerClient.Flush(1000)
+	producerClient.Flush(10000)
 }
