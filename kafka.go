@@ -10,6 +10,7 @@ import (
 )
 
 func getAdminClient(brokerConfig Config) *kafka.AdminClient {
+
 	adminClient, err := kafka.NewAdminClient(&kafka.ConfigMap{
 		"bootstrap.servers": brokerConfig.BootstrapServers,
 		"sasl.mechanism":    brokerConfig.SaslMechanism,
@@ -36,11 +37,16 @@ func getConsumerClient(consumerConfig Config) *kafka.Consumer {
 		"sasl.password":     consumerConfig.KafkaPassword,
 		"group.id":          consumerConfig.KafkaConsumerGroup,
 		"auto.offset.reset": consumerConfig.AutoOffsetReset})
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	return consumerClient
+
+}
+
+func getProducerClient(consumerConfig Config) *kafka.Producer {
 
 }
 
@@ -54,14 +60,17 @@ func listTopics(topics []string) {
 }
 
 func createTopic(adminClient *kafka.AdminClient, topic yamlTopic) {
+
 	topicConfig := map[string]string{
 		"retention.ms":   topic.RetentionMs,
 		"cleanup.policy": topic.CleanupPolicy}
+
 	topicSpec := kafka.TopicSpecification{
 		Topic:             topic.Name,
 		NumPartitions:     topic.Partitions,
 		ReplicationFactor: topic.ReplicationFactor,
 		Config:            topicConfig}
+
 	topicSpecs := []kafka.TopicSpecification{topicSpec}
 	result, err := adminClient.CreateTopics(context.Background(), topicSpecs)
 
@@ -73,6 +82,7 @@ func createTopic(adminClient *kafka.AdminClient, topic yamlTopic) {
 }
 
 func deleteTopic(adminClient *kafka.AdminClient, name string) {
+
 	topics := []string{name}
 	result, err := adminClient.DeleteTopics(context.Background(), topics)
 
@@ -84,6 +94,7 @@ func deleteTopic(adminClient *kafka.AdminClient, name string) {
 }
 
 func getTopicsFromBroker(adminClient *kafka.AdminClient) []string {
+
 	metadata, err := adminClient.GetMetadata(nil, true, 5000)
 
 	if err != nil {
@@ -101,6 +112,7 @@ func getTopicsFromBroker(adminClient *kafka.AdminClient) []string {
 }
 
 func getTopicPartitions(adminClient *kafka.AdminClient, topic string) []kafka.PartitionMetadata {
+
 	metadata, err := adminClient.GetMetadata(&topic, false, 5000)
 
 	if err != nil {
@@ -114,7 +126,9 @@ func getTopicPartitions(adminClient *kafka.AdminClient, topic string) []kafka.Pa
 }
 
 func getConsumerSubscribed(consumerClient *kafka.Consumer, topics []string) *kafka.Consumer {
+
 	err := consumerClient.SubscribeTopics(topics, nil)
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -123,19 +137,23 @@ func getConsumerSubscribed(consumerClient *kafka.Consumer, topics []string) *kaf
 }
 
 func getConsumerAssigned(consumerClient *kafka.Consumer, topic string) *kafka.Consumer {
+
 	adminClient, err := kafka.NewAdminClientFromConsumer(consumerClient)
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	partitionsMetadata := getTopicPartitions(adminClient, topic)
 	var topicPartitions []kafka.TopicPartition
+
 	for part := range partitionsMetadata {
 		tp := kafka.TopicPartition{Topic: &topic, Partition: int32(part)}
 		topicPartitions = append(topicPartitions, tp)
 	}
 
 	err = consumerClient.Assign(topicPartitions)
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -147,6 +165,7 @@ func consumeMessages(consumerClient *kafka.Consumer, consumeMessagesCounter int)
 
 	run := true
 	counter := 0
+
 	for run == true {
 		ev := consumerClient.Poll(0)
 		switch e := ev.(type) {
@@ -163,6 +182,7 @@ func consumeMessages(consumerClient *kafka.Consumer, consumeMessagesCounter int)
 	}
 
 	err := consumerClient.Close()
+
 	if err != nil {
 		log.Fatal(err)
 	}
