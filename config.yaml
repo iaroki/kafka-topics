@@ -1,7 +1,7 @@
 bootstrap.servers: 127.0.0.1:9092
 sasl.mechanism: SCRAM-SHA-512
 security.protocol: SASL_SSL
-ssl.truststore.location:
+ssl.ca.location: /etc/ssl/certs
 kafka.username: user
 kafka.password: pass
 kafka.topic: mytopic

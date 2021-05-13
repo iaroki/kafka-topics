@@ -16,7 +16,7 @@ func getAdminClient(brokerConfig Config) *kafka.AdminClient {
 		"bootstrap.servers": brokerConfig.BootstrapServers,
 		"sasl.mechanism":    brokerConfig.SaslMechanism,
 		"security.protocol": brokerConfig.SecurityProtocol,
-		"ssl.ca.location":   brokerConfig.SslTruststoreLocation,
+		"ssl.ca.location":   brokerConfig.SslCALocation,
 		"sasl.username":     brokerConfig.KafkaUsername,
 		"sasl.password":     brokerConfig.KafkaPassword})
 
@@ -33,7 +33,7 @@ func getConsumerClient(consumerConfig Config) *kafka.Consumer {
 		"bootstrap.servers": consumerConfig.BootstrapServers,
 		"sasl.mechanism":    consumerConfig.SaslMechanism,
 		"security.protocol": consumerConfig.SecurityProtocol,
-		"ssl.ca.location":   consumerConfig.SslTruststoreLocation,
+		"ssl.ca.location":   consumerConfig.SslCALocation,
 		"sasl.username":     consumerConfig.KafkaUsername,
 		"sasl.password":     consumerConfig.KafkaPassword,
 		"group.id":          consumerConfig.KafkaConsumerGroup,
@@ -55,7 +55,7 @@ func getProducerClient(consumerConfig Config) *kafka.Producer {
 		"bootstrap.servers": consumerConfig.BootstrapServers,
 		"sasl.mechanism":    consumerConfig.SaslMechanism,
 		"security.protocol": consumerConfig.SecurityProtocol,
-		"ssl.ca.location":   consumerConfig.SslTruststoreLocation,
+		"ssl.ca.location":   consumerConfig.SslCALocation,
 		"sasl.username":     consumerConfig.KafkaUsername,
 		"sasl.password":     consumerConfig.KafkaPassword,
 		"partitioner":       "murmur2_random",
