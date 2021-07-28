@@ -10,7 +10,10 @@ type Config struct {
 	BootstrapServers       string `yaml:"bootstrap.servers"`
 	SaslMechanism          string `yaml:"sasl.mechanism"`
 	SecurityProtocol       string `yaml:"security.protocol"`
-	SslCALocation          string `yaml:"ssl.ca.location"`
+	SSLCALocation          string `yaml:"ssl.ca.location"`
+	SSLKeyLocation         string `yaml:"ssl.key.location"`
+	SSLKeyPassword         string `yaml:"ssl.key.password"`
+	SSLCertificateLocation string `yaml:"ssl.certificate.location"`
 	KafkaUsername          string `yaml:"kafka.username"`
 	KafkaPassword          string `yaml:"kafka.password"`
 	KafkaTopic             string `yaml:"kafka.topic"`
