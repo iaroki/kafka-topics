@@ -13,12 +13,15 @@ import (
 func getAdminClient(brokerConfig Config) *kafka.AdminClient {
 
 	adminClient, err := kafka.NewAdminClient(&kafka.ConfigMap{
-		"bootstrap.servers": brokerConfig.BootstrapServers,
-		"sasl.mechanism":    brokerConfig.SaslMechanism,
-		"security.protocol": brokerConfig.SecurityProtocol,
-		"ssl.ca.location":   brokerConfig.SslCALocation,
-		"sasl.username":     brokerConfig.KafkaUsername,
-		"sasl.password":     brokerConfig.KafkaPassword})
+		"bootstrap.servers":        brokerConfig.BootstrapServers,
+		"sasl.mechanism":           brokerConfig.SaslMechanism,
+		"security.protocol":        brokerConfig.SecurityProtocol,
+		"ssl.ca.location":          brokerConfig.SSLCALocation,
+		"ssl.key.location":         brokerConfig.SSLKeyLocation,
+		"ssl.key.password":         brokerConfig.SSLKeyPassword,
+		"ssl.certificate.location": brokerConfig.SSLCertificateLocation,
+		"sasl.username":            brokerConfig.KafkaUsername,
+		"sasl.password":            brokerConfig.KafkaPassword})
 
 	if err != nil {
 		log.Fatalf("==> Failed to create AdminClient: %s", err)
@@ -30,14 +33,17 @@ func getAdminClient(brokerConfig Config) *kafka.AdminClient {
 func getConsumerClient(consumerConfig Config) *kafka.Consumer {
 
 	consumerClient, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers": consumerConfig.BootstrapServers,
-		"sasl.mechanism":    consumerConfig.SaslMechanism,
-		"security.protocol": consumerConfig.SecurityProtocol,
-		"ssl.ca.location":   consumerConfig.SslCALocation,
-		"sasl.username":     consumerConfig.KafkaUsername,
-		"sasl.password":     consumerConfig.KafkaPassword,
-		"group.id":          consumerConfig.KafkaConsumerGroup,
-		"auto.offset.reset": consumerConfig.AutoOffsetReset})
+		"bootstrap.servers":        consumerConfig.BootstrapServers,
+		"sasl.mechanism":           consumerConfig.SaslMechanism,
+		"security.protocol":        consumerConfig.SecurityProtocol,
+		"ssl.ca.location":          consumerConfig.SSLCALocation,
+		"ssl.key.location":         consumerConfig.SSLKeyLocation,
+		"ssl.key.password":         consumerConfig.SSLKeyPassword,
+		"ssl.certificate.location": consumerConfig.SSLCertificateLocation,
+		"sasl.username":            consumerConfig.KafkaUsername,
+		"sasl.password":            consumerConfig.KafkaPassword,
+		"group.id":                 consumerConfig.KafkaConsumerGroup,
+		"auto.offset.reset":        consumerConfig.AutoOffsetReset})
 
 	if err != nil {
 		log.Fatal(err)
@@ -52,15 +58,18 @@ func getProducerClient(consumerConfig Config) *kafka.Producer {
 	hostname, err := os.Hostname()
 	clientId := "kafka-topics-" + hostname
 	producerClient, err := kafka.NewProducer(&kafka.ConfigMap{
-		"bootstrap.servers": consumerConfig.BootstrapServers,
-		"sasl.mechanism":    consumerConfig.SaslMechanism,
-		"security.protocol": consumerConfig.SecurityProtocol,
-		"ssl.ca.location":   consumerConfig.SslCALocation,
-		"sasl.username":     consumerConfig.KafkaUsername,
-		"sasl.password":     consumerConfig.KafkaPassword,
-		"partitioner":       "murmur2_random",
-		"client.id":         clientId,
-		"acks":              "all"})
+		"bootstrap.servers":        consumerConfig.BootstrapServers,
+		"sasl.mechanism":           consumerConfig.SaslMechanism,
+		"security.protocol":        consumerConfig.SecurityProtocol,
+		"ssl.ca.location":          consumerConfig.SSLCALocation,
+		"ssl.key.location":         consumerConfig.SSLKeyLocation,
+		"ssl.key.password":         consumerConfig.SSLKeyPassword,
+		"ssl.certificate.location": consumerConfig.SSLCertificateLocation,
+		"sasl.username":            consumerConfig.KafkaUsername,
+		"sasl.password":            consumerConfig.KafkaPassword,
+		"partitioner":              "murmur2_random",
+		"client.id":                clientId,
+		"acks":                     "all"})
 
 	if err != nil {
 		log.Fatal(err)
