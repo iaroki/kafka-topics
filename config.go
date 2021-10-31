@@ -7,22 +7,22 @@ import (
 )
 
 type Config struct {
-	BootstrapServers       string `yaml:"bootstrap.servers"`
-	SaslMechanism          string `yaml:"sasl.mechanism"`
-	SecurityProtocol       string `yaml:"security.protocol"`
-	SSLCALocation          string `yaml:"ssl.ca.location"`
-	SSLKeyLocation         string `yaml:"ssl.key.location"`
-	SSLKeyPassword         string `yaml:"ssl.key.password"`
-	SSLCertificateLocation string `yaml:"ssl.certificate.location"`
-	KafkaUsername          string `yaml:"kafka.username"`
-	KafkaPassword          string `yaml:"kafka.password"`
-	KafkaTopic             string `yaml:"kafka.topic"`
-	KafkaTopicSubscribe    bool   `yaml:"kafka.topic.subscribe"`
-	KafkaConsumerGroup     string `yaml:"kafka.consumer.group"`
-	AutoOffsetReset        string `yaml:"auto.offset.reset"`
-	TopicVersioningEnabled bool   `yaml:"topic.versioning.enabled"`
-	TopicVersion           int    `yaml:"topic.version"`
-	ConsumeMessagesCounter int    `yaml:"consume.messages.counter"`
+	BootstrapServers       string `yaml:"bootstrap_servers"`
+	SaslMechanism          string `yaml:"sasl_mechanism"`
+	SecurityProtocol       string `yaml:"security_protocol"`
+	SSLCALocation          string `yaml:"ssl_ca_location"`
+	SSLKeyLocation         string `yaml:"ssl_key_location"`
+	SSLKeyPassword         string `yaml:"ssl_key_password"`
+	SSLCertificateLocation string `yaml:"ssl_certificate_location"`
+	KafkaUsername          string `yaml:"kafka_username"`
+	KafkaPassword          string `yaml:"kafka_password"`
+	KafkaTopic             string `yaml:"kafka_topic"`
+	KafkaTopicSubscribe    bool   `yaml:"kafka_topic_subscribe"`
+	KafkaConsumerGroup     string `yaml:"kafka_consumer_group"`
+	AutoOffsetReset        string `yaml:"auto_offset_reset"`
+	TopicVersioningEnabled bool   `yaml:"topic_versioning_enabled"`
+	TopicVersion           int    `yaml:"topic_version"`
+	ConsumeMessagesCounter int    `yaml:"consume_messages_counter"`
 }
 
 func getConfig(configFilePath string) Config {
