@@ -1,16 +1,16 @@
-bootstrap.servers: 127.0.0.1:9092
-sasl.mechanism: SCRAM-SHA-512
-security.protocol: SASL_SSL
-ssl.ca.location: /etc/ssl/certs
-ssl.key.location:
-ssl.key.password:
-ssl.certificate.location:
-kafka.username: user
-kafka.password: pass
-kafka.topic: mytopic
-kafka.topic.subscribe: false
-kafka.consumer.group: m2
-auto.offset.reset: earliest
-topic.versioning.enabled: true
-topic.version: 16
-consume.messages.counter: -1
+bootstrap_servers: 127.0.0.1:9092
+sasl_mechanism: PLAIN
+security_protocol: SASL_SSL
+ssl_ca_location: /etc/ssl/certs
+ssl_key_location:
+ssl_key_password:
+ssl_certificate_location:
+kafka_username: user
+kafka_password: pass
+kafka_topic: mytopic
+kafka_topic_subscribe: false
+kafka_consumer_group: m2
+auto_offset_reset: earliest
+topic_versioning_enabled: true
+topic_version: 16
+consume_messages_counter: -1
