@@ -89,10 +89,13 @@ func initApp() {
 				}
 
 				fmt.Println("==> Adding topics to broker:", appConfig.BootstrapServers)
-				topics := getYamlData(topicFile)
+				fileTopics := getYamlData(topicFile)
 				adminClient := getAdminClient(appConfig)
+				brokerTopicsList := getTopicsFromBroker(adminClient)
 
 				var version string
+        var diffTopicsList []string
+        var fileTopicsList []string
 
 				if topicVersion != "" {
 					version = topicVersion
@@ -100,10 +103,21 @@ func initApp() {
 					version = strconv.Itoa(appConfig.TopicVersion)
 				}
 
-				for _, topic := range topics.Topics {
-					topic.Name = versionize(topic.Name, appConfig.TopicVersioningEnabled, version) // COMMAND VERSIONIZER
-					createTopic(adminClient, topic)
+				for _, topic := range fileTopics.Topics {
+					topic.Name = versionize(topic.Name, appConfig.TopicVersioningEnabled, version)
+          fileTopicsList = append(fileTopicsList, topic.Name)
 				}
+
+        diffTopicsList = getDiffTopicsList(fileTopicsList, brokerTopicsList)
+
+        for _, diffTopic := range diffTopicsList {
+          for _, fileTopic := range fileTopics.Topics {
+            fileTopic.Name = versionize(fileTopic.Name, appConfig.TopicVersioningEnabled, version)
+            if diffTopic == fileTopic.Name {
+              createTopic(adminClient, fileTopic)
+            }
+          }
+        }
 
 			case "del":
 				if topicFile == "" {
