@@ -94,8 +94,8 @@ func initApp() {
 				brokerTopicsList := getTopicsFromBroker(adminClient)
 
 				var version string
-        var diffTopicsList []string
-        var fileTopicsList []string
+				var diffTopicsList []string
+				var fileTopicsList []string
 
 				if topicVersion != "" {
 					version = topicVersion
@@ -105,19 +105,19 @@ func initApp() {
 
 				for _, topic := range fileTopics.Topics {
 					topic.Name = versionize(topic.Name, appConfig.TopicVersioningEnabled, version)
-          fileTopicsList = append(fileTopicsList, topic.Name)
+					fileTopicsList = append(fileTopicsList, topic.Name)
 				}
 
-        diffTopicsList = getDiffTopicsList(fileTopicsList, brokerTopicsList)
+				diffTopicsList = getDiffTopicsList(fileTopicsList, brokerTopicsList)
 
-        for _, diffTopic := range diffTopicsList {
-          for _, fileTopic := range fileTopics.Topics {
-            fileTopic.Name = versionize(fileTopic.Name, appConfig.TopicVersioningEnabled, version)
-            if diffTopic == fileTopic.Name {
-              createTopic(adminClient, fileTopic)
-            }
-          }
-        }
+				for _, diffTopic := range diffTopicsList {
+					for _, fileTopic := range fileTopics.Topics {
+						fileTopic.Name = versionize(fileTopic.Name, appConfig.TopicVersioningEnabled, version)
+						if diffTopic == fileTopic.Name {
+							createTopic(adminClient, fileTopic)
+						}
+					}
+				}
 
 			case "del":
 				if topicFile == "" {

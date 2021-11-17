@@ -63,22 +63,21 @@ func getMessageData(fileName string) []string {
 }
 
 func getDiffTopicsList(fileTopicsList, brokerTopicsList []string) []string {
-  brokerTopicsMap := make(map[string]struct{}, len(brokerTopicsList))
+	brokerTopicsMap := make(map[string]struct{}, len(brokerTopicsList))
 
-  for _, topic := range brokerTopicsList {
-      brokerTopicsMap[topic] = struct{}{}
-  }
+	for _, topic := range brokerTopicsList {
+		brokerTopicsMap[topic] = struct{}{}
+	}
 
-  var diffTopicsList []string
+	var diffTopicsList []string
 
-  for _, topic := range fileTopicsList {
-      if _, found := brokerTopicsMap[topic]; !found {
-        diffTopicsList = append(diffTopicsList, topic)
-      } else {
-        fmt.Printf("==> Skipping %s... %s\n", topic, "Exists")
-      }
-  }
+	for _, topic := range fileTopicsList {
+		if _, found := brokerTopicsMap[topic]; !found {
+			diffTopicsList = append(diffTopicsList, topic)
+		} else {
+			fmt.Printf("==> Skipping %s... %s\n", topic, "Exists")
+		}
+	}
 
-  return diffTopicsList
+	return diffTopicsList
 }
-
